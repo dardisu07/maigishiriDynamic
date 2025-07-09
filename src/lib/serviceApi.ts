@@ -1,4 +1,5 @@
 import { maskawaAPI } from './maskawaApi';
+import { naijadatasubAPI } from './naijadatasubApi';
 import { supabase } from './supabase';
 import { generateTransactionReference } from './utils';
 
@@ -17,6 +18,26 @@ export interface ServiceTransaction {
 }
 
 class ServiceAPI {
+  private async getActiveApiProvider(): Promise<'maskawa' | 'naijadatasub'> {
+    try {
+      const { data, error } = await supabase
+        .from('admin_settings')
+        .select('value')
+        .eq('key', 'active_api_provider')
+        .single();
+
+      if (error) {
+        console.error('Error fetching active API provider:', error);
+        return 'maskawa'; // Default to maskawa if there's an error
+      }
+
+      return (data?.value === 'naijadatasub') ? 'naijadatasub' : 'maskawa';
+    } catch (error) {
+      console.error('Error in getActiveApiProvider:', error);
+      return 'maskawa'; // Default to maskawa if there's an exception
+    }
+  }
+
   async processAirtimeTransaction(
     userId: string,
     data: {
@@ -54,11 +75,22 @@ class ServiceAPI {
 
     try {
       // Call MASKAWA API
-      const apiResponse = await maskawaAPI.buyAirtime({
-        network: data.network as any,
-        amount: data.amount,
-        mobile_number: data.phoneNumber,
-      });
+      const activeProvider = await this.getActiveApiProvider();
+      let apiResponse;
+      
+      if (activeProvider === 'naijadatasub') {
+        apiResponse = await naijadatasubAPI.buyAirtime({
+          network: data.network as any,
+          amount: data.amount,
+          mobile_number: data.phoneNumber,
+        });
+      } else {
+        apiResponse = await maskawaAPI.buyAirtime({
+          network: data.network as any,
+          amount: data.amount,
+          mobile_number: data.phoneNumber,
+        });
+      }
 
       // Update transaction as successful
       const { error: updateError } = await supabase
@@ -68,7 +100,8 @@ class ServiceAPI {
           details: {
             ...transaction.details,
             api_response: apiResponse,
-            external_reference: apiResponse?.reference || apiResponse?.id,
+            external_reference: apiResponse?.reference || apiResponse?.id || apiResponse?.transaction_id,
+            api_provider: activeProvider
           },
         })
         .eq('id', dbTransaction.id);
@@ -174,11 +207,22 @@ class ServiceAPI {
 
     try {
       // Call MASKAWA API
-      const apiResponse = await maskawaAPI.buyData({
-        network: data.network as any,
-        mobile_number: data.phoneNumber,
-        plan: data.plan,
-      });
+      const activeProvider = await this.getActiveApiProvider();
+      let apiResponse;
+      
+      if (activeProvider === 'naijadatasub') {
+        apiResponse = await naijadatasubAPI.buyData({
+          network: data.network as any,
+          mobile_number: data.phoneNumber,
+          plan: data.plan,
+        });
+      } else {
+        apiResponse = await maskawaAPI.buyData({
+          network: data.network as any,
+          mobile_number: data.phoneNumber,
+          plan: data.plan,
+        });
+      }
 
       // Update transaction as successful
       const { error: updateError } = await supabase
@@ -188,7 +232,8 @@ class ServiceAPI {
           details: {
             ...transaction.details,
             api_response: apiResponse,
-            external_reference: apiResponse?.reference || apiResponse?.id,
+            external_reference: apiResponse?.reference || apiResponse?.id || apiResponse?.transaction_id,
+            api_provider: activeProvider
           },
         })
         .eq('id', dbTransaction.id);
@@ -294,12 +339,24 @@ class ServiceAPI {
 
     try {
       // Call MASKAWA API
-      const apiResponse = await maskawaAPI.buyElectricity({
-        disco_name: data.disco as any,
-        amount: data.amount,
-        meter_number: data.meterNumber,
-        meter_type: data.meterType as any,
-      });
+      const activeProvider = await this.getActiveApiProvider();
+      let apiResponse;
+      
+      if (activeProvider === 'naijadatasub') {
+        apiResponse = await naijadatasubAPI.buyElectricity({
+          disco_name: data.disco as any,
+          amount: data.amount,
+          meter_number: data.meterNumber,
+          meter_type: data.meterType as any,
+        });
+      } else {
+        apiResponse = await maskawaAPI.buyElectricity({
+          disco_name: data.disco as any,
+          amount: data.amount,
+          meter_number: data.meterNumber,
+          meter_type: data.meterType as any,
+        });
+      }
 
       // Update transaction as successful
       const { error: updateError } = await supabase
@@ -309,7 +366,8 @@ class ServiceAPI {
           details: {
             ...transaction.details,
             api_response: apiResponse,
-            external_reference: apiResponse?.reference || apiResponse?.id,
+            external_reference: apiResponse?.reference || apiResponse?.id || apiResponse?.transaction_id,
+            api_provider: activeProvider
           },
         })
         .eq('id', dbTransaction.id);
