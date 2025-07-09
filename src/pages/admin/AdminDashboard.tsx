@@ -303,6 +303,7 @@ const AdminDashboard: React.FC = () => {
       path: '/admin/cable-plans',
       color: 'bg-blue-500',
     },
+   {
       title: 'Support Tickets',
       description: 'Manage customer support',
       icon: MessageCircle,
