@@ -221,7 +221,7 @@ const ProductDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900">
+    <div className="min-h-screen bg-white dark:bg-gray-900 pb-20">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 px-4 py-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center">
@@ -290,7 +290,7 @@ const ProductDetailPage: React.FC = () => {
           {/* Price */}
           <div>
             <p className="text-2xl font-bold text-[#0F9D58]">
-              ${product.price.toFixed(2)}
+              ₦{product.price.toFixed(2)}
             </p>
           </div>
 
@@ -338,7 +338,7 @@ const ProductDetailPage: React.FC = () => {
       </div>
 
       {/* Fixed Add to Cart Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-40">
         <button
           onClick={handleAddToCart}
           disabled={!isAuthenticated || !product.in_stock}
