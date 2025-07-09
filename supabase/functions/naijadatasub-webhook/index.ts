@@ -22,36 +22,10 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get the webhook secret from environment variables or database
-    const { data: apiSettings, error: settingsError } = await supabase
-      .from("api_settings")
-      .select("key_value")
-      .eq("key_name", "naijadatasub_webhook_secret")
-      .single();
-
-    if (settingsError) {
-      console.error("Error fetching webhook secret:", settingsError);
-    }
-
-    const webhookSecret = apiSettings?.key_value || Deno.env.get("NAIJADATASUB_WEBHOOK_SECRET");
-
-    // Get the signature from the request headers
-    const signature = req.headers.get("x-naijadatasub-signature");
-    
-    // In production, verify the signature
-    // For testing, we'll skip this step but in production you should uncomment this
-    /*
-    if (!signature || signature !== webhookSecret) {
-      console.error("Invalid webhook signature");
-      return new Response(
-        JSON.stringify({ success: false, error: "Invalid signature" }),
-        {
-          status: 401,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
-    */
+    // Note: NaijaDataSub doesn't provide a webhook secret, so we don't verify signatures
+    // This is different from other payment providers that typically provide a way to verify
+    // webhook authenticity. In a production environment, you might want to implement
+    // additional security measures like IP whitelisting if possible.
 
     // Parse webhook payload
     const payload = await req.json();
