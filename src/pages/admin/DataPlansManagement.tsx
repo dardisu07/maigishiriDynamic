@@ -25,6 +25,8 @@ import {
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 import { formatCurrency } from '../../lib/utils';
+import Card from '../../components/ui/Card';
+import Button from '../../components/ui/Button';
 
 type DataPlan = {
   id: string;
@@ -76,6 +78,7 @@ const DataPlansManagement: React.FC = () => {
 
   const [formData, setFormData] = useState({
     description: '',
+    cost_price: '',
     selling_price: '',
     profit_margin: '',
     is_active: true,
@@ -156,6 +159,7 @@ const DataPlansManagement: React.FC = () => {
     setEditingPlan(plan);
     setFormData({
       description: plan.description,
+      cost_price: plan.cost_price.toString(),
       selling_price: plan.selling_price.toString(),
       profit_margin: plan.profit_margin.toString(),
       is_active: plan.is_active,
@@ -897,6 +901,20 @@ const DataPlansManagement: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Cost Price (₦)
+                </label>
+                <input
+                  type="number"
+                  value={formData.cost_price}
+                  onChange={(e) => setFormData({...formData, cost_price: e.target.value})}
+                  min="0"
+                  step="0.01"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F9D58]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Selling Price (₦)
                 </label>
                 <input
@@ -913,28 +931,26 @@ const DataPlansManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Profit Margin (%)
-                </label>
-                <input
-                  type="number"
-                  value={formData.profit_margin}
-                  onChange={(e) => {
-                    const margin = parseFloat(e.target.value);
-                    setFormData({
-                      ...formData, 
-                      profit_margin: e.target.value,
-                      selling_price: isNaN(margin) ? formData.selling_price : 
-                        (editingPlan.cost_price + (editingPlan.cost_price * (margin / 100))).toFixed(2)
-                    });
-                  }}
-                  min="0"
-                  step="0.1"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F9D58]"
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Changing profit margin automatically updates selling price
-                </p>
+                <Card className="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-blue-800 dark:text-blue-200">Profit Margin:</span>
+                    <span className="text-sm font-bold text-blue-800 dark:text-blue-200">
+                      {formData.cost_price && formData.selling_price ? 
+                        formatCurrency(Number(formData.selling_price) - Number(formData.cost_price)) : 
+                        '₦0.00'}
+                    </span>
+                  </div>
+                  {formData.cost_price && formData.selling_price && (
+                    <div className="flex justify-between items-center mt-1">
+                      <span className="text-xs text-blue-700 dark:text-blue-300">Percentage:</span>
+                      <span className="text-xs text-blue-700 dark:text-blue-300">
+                        {Number(formData.cost_price) > 0 ? 
+                          `${(((Number(formData.selling_price) - Number(formData.cost_price)) / Number(formData.cost_price)) * 100).toFixed(2)}%` : 
+                          'N/A'}
+                      </span>
+                    </div>
+                  )}
+                </Card>
               </div>
 
               <div>
