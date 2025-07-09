@@ -16,7 +16,6 @@ import {
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 import { formatCurrency } from '../../lib/utils';
-import Button from '../../components/ui/Button';
 
 type Product = {
   id: string;
