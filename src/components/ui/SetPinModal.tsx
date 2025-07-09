@@ -102,7 +102,7 @@ const SetPinModal: React.FC<SetPinModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 animate-fade-in">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black bg-opacity-50 animate-fade-in">
       <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 relative animate-slide-up">
         {/* Close button */}
         <button
