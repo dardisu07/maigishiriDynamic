@@ -3,19 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
   Plus, Edit, Trash2, Search, Filter,
-  Save, Wifi, Eye, EyeOff, Star,
-  DollarSign, Tag, Clock, Percent, AlertTriangle,
-  Database,
-  RefreshCw,
-  ToggleLeft,
-  ToggleRight
-} from 'lucide-react';
-import { supabase } from '../../lib/supabase';
-import { useAuthStore } from '../../store/authStore';
-import { formatCurrency } from '../../lib/utils';
-import Card from '../../components/ui/Card';
-import Button from '../../components/ui/Button';
-
+  CheckCircle, XCircle, AlertTriangle,
+  Wifi, Tag, DollarSign, Percent, Clock, Star
 type DataPlan = {
   id: string;
   external_id: number;
