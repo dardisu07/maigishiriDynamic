@@ -873,7 +873,302 @@ const TvServicePage: React.FC = () => {
 
   return (
     <>
-      {step === 1 && renderStepOne()}
+      {step === 1 && (
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          {/* Header */}
+          <div className="bg-white dark:bg-gray-800 px-4 py-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center">
+              <button
+                onClick={() => navigate('/')}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+              >
+                <ArrowLeft size={24} className="text-gray-700 dark:text-gray-300" />
+              </button>
+              <h1 className="text-xl font-semibold text-gray-900 dark:text-white ml-4">TV Subscription</h1>
+            </div>
+            <button
+              onClick={() => navigate('/transactions')}
+              className="text-primary-500 text-sm font-medium"
+            >
+              History
+            </button>
+          </div>
+
+          <div className="p-4 space-y-6">
+            {/* Provider Selection */}
+            <div>
+              <label className="block text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                Select Provider
+              </label>
+              <div className="grid grid-cols-3 gap-3">
+                {loadingProviders ? (
+                  <div className="col-span-3 flex justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0F9D58]"></div>
+                  </div>
+                ) : (
+                  cableProviders.map((provider) => (
+                    <div
+                      key={provider.id}
+                      onClick={() => setSelectedProvider(provider)}
+                      className={`rounded-xl p-4 cursor-pointer transition-all ${
+                        selectedProvider?.id === provider.id
+                          ? 'bg-[#0F9D58]/10 border-2 border-[#0F9D58]'
+                          : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'
+                      }`}
+                    >
+                      <div className="flex flex-col items-center">
+                        <div className="w-12 h-12 bg-[#0F9D58]/10 rounded-full flex items-center justify-center mb-2">
+                          <Tv size={24} className="text-[#0F9D58]" />
+                        </div>
+                        <h3 className="text-base font-medium text-center">{provider.name}</h3>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Smart Card Number */}
+            <div>
+              <label className="block text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                Smart Card Number
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={smartCardNumber}
+                  onChange={(e) => {
+                    setSmartCardNumber(e.target.value);
+                    setCustomerInfo(null); // Clear customer info when smart card number changes
+                  }}
+                  placeholder="Enter smart card number"
+                  className="w-full px-4 py-4 border border-gray-300 dark:border-gray-600 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#0F9D58]"
+                />
+                <button
+                  onClick={() => setShowBeneficiaries(!showBeneficiaries)}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                >
+                  <User size={20} />
+                </button>
+              </div>
+              
+              {/* Beneficiaries Dropdown */}
+              {showBeneficiaries && beneficiaries.length > 0 && (
+                <div className="bg-white dark:bg-gray-700 rounded-lg p-2 mt-2 shadow-lg">
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 px-2">Recent Beneficiaries</h3>
+                  <div className="max-h-48 overflow-y-auto">
+                    {beneficiaries.map(beneficiary => (
+                      <div 
+                        key={beneficiary.id}
+                        className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg cursor-pointer"
+                        onClick={() => selectBeneficiary(beneficiary)}
+                      >
+                        <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center mr-3">
+                          <User size={16} className="text-gray-500 dark:text-gray-400" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900 dark:text-white text-sm">{beneficiary.name}</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">{beneficiary.phone_number}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex justify-between mt-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Enter the smart card number printed on your decoder
+                </p>
+                <button
+                  onClick={validateSmartCard}
+                  disabled={!selectedProvider || !smartCardNumber || isValidating}
+                  className="text-sm text-[#0F9D58] font-medium disabled:opacity-50"
+                >
+                  {isValidating ? 'Validating...' : 'Validate'}
+                </button>
+              </div>
+            </div>
+
+            {/* Customer Info */}
+            {customerInfo && (
+              <div className="bg-green-50 dark:bg-green-900/20 rounded-xl p-4 border border-green-200 dark:border-green-800">
+                <div className="flex items-start">
+                  <CheckCircle className="text-green-500 flex-shrink-0 mt-0.5" size={20} />
+                  <div className="ml-3">
+                    <h3 className="font-medium text-green-800 dark:text-green-200">Customer Verified</h3>
+                    <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                      Name: <span className="font-medium">{customerInfo.name}</span>
+                    </p>
+                    {customerInfo.dueDate && (
+                      <p className="text-sm text-green-700 dark:text-green-300">
+                        Due Date: <span className="font-medium">{customerInfo.dueDate}</span>
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {errorMessage && (
+              <div className="bg-red-50 dark:bg-red-900/20 rounded-xl p-4 border border-red-200 dark:border-red-800">
+                <div className="flex items-start">
+                  <AlertCircle className="text-red-500 flex-shrink-0 mt-0.5" size={20} />
+                  <div className="ml-3">
+                    <h3 className="font-medium text-red-800 dark:text-red-200">Error</h3>
+                    <p className="text-sm text-red-700 dark:text-red-300 mt-1">{errorMessage}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Plan Selection */}
+            {selectedProvider && (
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <label className="block text-lg font-semibold text-gray-900 dark:text-white">
+                    Select Plan
+                  </label>
+                  <div className="relative w-full max-w-[200px]">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+                    <input
+                      type="text"
+                      placeholder="Search plans..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#0F9D58]"
+                    />
+                  </div>
+                </div>
+
+                {/* Popular Plans */}
+                {popularPlans.length > 0 && searchQuery === '' && (
+                  <div className="mb-4">
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Popular Plans</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      {popularPlans.map((plan) => (
+                        <div
+                          key={plan.id}
+                          onClick={() => setSelectedPlan(plan)}
+                          className={`rounded-xl p-4 cursor-pointer transition-all ${
+                            selectedPlan?.id === plan.id
+                              ? 'bg-[#0F9D58]/10 border-2 border-[#0F9D58]'
+                              : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'
+                          }`}
+                        >
+                          <div className="flex flex-col h-full">
+                            <h3 className="text-base font-medium mb-1">{plan.name}</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 flex-grow">
+                              {selectedProvider.name} Subscription
+                            </p>
+                            <div className="mt-2">
+                              <p className="text-lg font-bold text-[#0F9D58]">
+                                {formatCurrency(plan.selling_price)}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* All Plans */}
+                <div className="w-full">
+                  {searchQuery !== '' && (
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Search Results</h3>
+                  )}
+                  
+                  {loadingPlans ? (
+                    <div className="flex justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0F9D58]"></div>
+                    </div>
+                  ) : filteredPlans.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-3">
+                      {filteredPlans.map((plan) => (
+                        <div
+                          key={plan.id}
+                          onClick={() => setSelectedPlan(plan)}
+                          className={`rounded-xl p-4 cursor-pointer transition-all ${
+                            selectedPlan?.id === plan.id
+                              ? 'bg-[#0F9D58]/10 border-2 border-[#0F9D58]'
+                              : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'
+                          }`}
+                        >
+                          <div className="flex flex-col h-full">
+                            <h3 className="text-base font-medium mb-1">{plan.name}</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 flex-grow">
+                              {selectedProvider.name} Subscription
+                            </p>
+                            <div className="mt-2">
+                              <p className="text-lg font-bold text-[#0F9D58]">
+                                {formatCurrency(plan.selling_price)}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                      <Tv className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No plans found</h3>
+                      <p className="text-gray-600 dark:text-gray-400">
+                        {cablePlans.length === 0 
+                          ? "No plans available for this provider" 
+                          : "Try adjusting your search criteria"}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Save as Beneficiary */}
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-700 dark:text-gray-300">Save as Beneficiary</span>
+                <button
+                  onClick={() => setSaveAsBeneficiary(!saveAsBeneficiary)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    saveAsBeneficiary ? 'bg-primary-500' : 'bg-gray-300 dark:bg-gray-600'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      saveAsBeneficiary ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+              
+              {saveAsBeneficiary && (
+                <div className="mt-3 animate-fade-in">
+                  <input
+                    type="text"
+                    value={beneficiaryName}
+                    onChange={(e) => setBeneficiaryName(e.target.value)}
+                    placeholder="Enter beneficiary name"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Continue Button */}
+            <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+              <Button
+                onClick={handleContinue}
+                disabled={!selectedProvider || !selectedPlan || !smartCardNumber || !customerInfo || (saveAsBeneficiary && !beneficiaryName)}
+                className="w-full bg-[#0F9D58] hover:bg-[#0d8a4f] text-white py-4 rounded-xl font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Continue
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       {step === 2 && renderStepTwo()}
       {step === 3 && renderStepThree()}
 
@@ -893,5 +1188,3 @@ const TvServicePage: React.FC = () => {
     </>
   );
 };
-
-export default TvServicePage;
