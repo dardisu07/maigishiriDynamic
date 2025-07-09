@@ -221,7 +221,7 @@ const ProductDetailPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 pb-20">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 px-4 py-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center">
@@ -295,32 +295,28 @@ const ProductDetailPage: React.FC = () => {
           </div>
 
           {/* Description */}
-          <div>
+          <div className="mb-6">
             <p className="text-gray-600 dark:text-gray-400 text-sm">
               {product.description}
             </p>
           </div>
 
-          {/* Size Selection */}
-          <div>
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Select Size
-            </p>
-            <div className="flex space-x-3">
-              {['XL', 'L', 'M', 'S'].map((size) => (
-                <button
-                  key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`w-10 h-10 flex items-center justify-center rounded-lg border ${
-                    selectedSize === size 
-                      ? 'bg-gray-900 text-white border-gray-900' 
-                      : 'bg-white text-gray-900 border-gray-300'
-                  }`}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
+          {/* Product Actions */}
+          <div className="flex space-x-3 mb-6">
+            <button
+              onClick={handleAddToCart}
+              disabled={!isAuthenticated || !product.in_stock}
+              className="flex-1 py-3 bg-gray-900 text-white rounded-lg font-semibold text-base disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Add to Cart
+            </button>
+            <button
+              onClick={handleBuyNow}
+              disabled={!isAuthenticated || !product.in_stock}
+              className="flex-1 py-3 bg-red-500 text-white rounded-lg font-semibold text-base disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Buy Now
+            </button>
           </div>
 
           {/* Authentication Notice */}
@@ -335,17 +331,6 @@ const ProductDetailPage: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Fixed Add to Cart Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-40">
-        <button
-          onClick={handleAddToCart}
-          disabled={!isAuthenticated || !product.in_stock}
-          className="w-full py-3 bg-red-500 text-white rounded-full font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Add to Cart
-        </button>
       </div>
 
       {/* Transaction PIN Modal */}
