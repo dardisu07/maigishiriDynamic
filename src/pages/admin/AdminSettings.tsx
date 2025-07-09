@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, 
   Save,
+  Server,
   Settings,
   Percent,
   Globe,
@@ -117,6 +118,11 @@ const AdminSettings: React.FC = () => {
   // Check if we need to add new settings
   const ensureRequiredSettings = async () => {
     const requiredSettings = [
+      {
+        key: 'active_api_provider',
+        value: 'maskawa',
+        description: 'Active API provider for services (maskawa or naijadatasub)'
+      },
       {
         key: 'referral_reward_enabled',
         value: 'true',
@@ -346,6 +352,8 @@ const AdminSettings: React.FC = () => {
 
   const getSettingIcon = (key: string) => {
     switch (key) {
+      case 'active_api_provider':
+        return <Server className="text-purple-500" size={20} />;
       case 'referral_bonus_percentage':
         return <Percent className="text-green-500" size={20} />;
       case 'referral_reward_enabled':
@@ -411,6 +419,10 @@ const AdminSettings: React.FC = () => {
       case 'maskawa_token':
       case 'maskawa_base_url':
         return <Key className="text-red-500" size={20} />;
+      case 'naijadatasub_token':
+        return <Key className="text-orange-500" size={20} />;
+      case 'naijadatasub_base_url':
+        return <Key className="text-orange-500" size={20} />;
       case 'flutterwave_public_key':
         return <CreditCard className="text-purple-500" size={20} />;
       case 'flutterwave_encryption_key':
@@ -446,7 +458,7 @@ const AdminSettings: React.FC = () => {
   };
 
   const settingCategories = {
-    'API Configuration': ['maskawa_token', 'maskawa_base_url', 'flutterwave_public_key', 'flutterwave_encryption_key'],
+    'API Configuration': ['active_api_provider', 'maskawa_token', 'maskawa_base_url', 'naijadatasub_token', 'naijadatasub_base_url', 'flutterwave_public_key', 'flutterwave_encryption_key'],
     'General': ['site_name', 'site_logo_url', 'app_base_url', 'support_email', 'support_phone'],
     'Footer Information': ['footer_company_name', 'footer_email', 'footer_phone', 'footer_address'],
     'Homepage Banners': ['hero_banner_image', 'hero_banner_image_alt', 'steps_banner_image'],
@@ -473,6 +485,18 @@ const AdminSettings: React.FC = () => {
 
   // Function to determine if a setting should be shown based on dependencies
   const shouldShowSetting = (key: string): boolean => {
+    // Show maskawa settings only when maskawa is the active provider or when viewing all settings
+    if ((key === 'maskawa_token' || key === 'maskawa_base_url') && 
+        activeTab !== 'api' && formData['active_api_provider'] !== 'maskawa') {
+      return false;
+    }
+    
+    // Show naijadatasub settings only when naijadatasub is the active provider or when viewing all settings
+    if ((key === 'naijadatasub_token' || key === 'naijadatasub_base_url') && 
+        activeTab !== 'api' && formData['active_api_provider'] !== 'naijadatasub') {
+      return false;
+    }
+    
     if (key === 'referral_reward_data_size') {
       return formData['referral_reward_type'] === 'data_bundle';
     }
@@ -618,22 +642,45 @@ const AdminSettings: React.FC = () => {
                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
                       {setting.description}
                     </p>
-                    
-                    {setting.key === 'maskawa_token' || setting.key === 'flutterwave_encryption_key' ? (
+
+                    {setting.key === 'active_api_provider' ? (
+                      <select
+                        value={formData[key] || setting.value}
+                        onChange={(e) => handleChange(key, e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      >
+                        <option value="maskawa">MASKAWA API</option>
+                        <option value="naijadatasub">NaijaDataSub API</option>
+                      </select>
+                    ) : setting.key === 'maskawa_token' || setting.key === 'naijadatasub_token' || setting.key === 'flutterwave_encryption_key' ? (
                       <div className="relative">
                         <input
-                          type={setting.key === 'maskawa_token' ? (showApiToken ? 'text' : 'password') : (showFlutterwaveEncryptionKey ? 'text' : 'password')}
+                          type={
+                            setting.key === 'maskawa_token' ? (showApiToken ? 'text' : 'password') : 
+                            setting.key === 'naijadatasub_token' ? (showApiToken ? 'text' : 'password') :
+                            (showFlutterwaveEncryptionKey ? 'text' : 'password')
+                          }
                           value={formData[key] || setting.value}
                           onChange={(e) => handleChange(key, e.target.value)}
-                          placeholder={setting.key === 'maskawa_token' ? "Enter MASKAWA API token" : "Enter Flutterwave encryption key"}
+                          placeholder={
+                            setting.key === 'maskawa_token' ? "Enter MASKAWA API token" : 
+                            setting.key === 'naijadatasub_token' ? "Enter NaijaDataSub API token" :
+                            "Enter Flutterwave encryption key"
+                          }
                           className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                         />
                         <button
                           type="button"
-                          onClick={() => setting.key === 'maskawa_token' ? setShowApiToken(!showApiToken) : setShowFlutterwaveEncryptionKey(!showFlutterwaveEncryptionKey)}
+                          onClick={() => {
+                            if (setting.key === 'maskawa_token' || setting.key === 'naijadatasub_token') {
+                              setShowApiToken(!showApiToken);
+                            } else {
+                              setShowFlutterwaveEncryptionKey(!showFlutterwaveEncryptionKey);
+                            }
+                          }}
                           className="absolute inset-y-0 right-0 pr-3 flex items-center"
                         >
-                          {setting.key === 'maskawa_token' ? (
+                          {(setting.key === 'maskawa_token' || setting.key === 'naijadatasub_token') ? (
                             showApiToken ? (
                               <EyeOff className="h-4 w-4 text-gray-400" />
                             ) : (
@@ -663,9 +710,21 @@ const AdminSettings: React.FC = () => {
                       </p>
                     )}
                     
+                    {setting.key === 'naijadatasub_token' && (
+                      <p className="text-xs text-red-500 dark:text-red-400 mt-1">
+                        ⚠️ Keep this token secure. It's used for all service transactions.
+                      </p>
+                    )}
+                    
                     {setting.key === 'maskawa_base_url' && (
                       <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         Base URL for MASKAWASUBAPI (usually https://maskawasubapi.com)
+                      </p>
+                    )}
+                    
+                    {setting.key === 'naijadatasub_base_url' && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Base URL for NaijaDataSub API (usually https://naijadatasub.com.ng)
                       </p>
                     )}
 
@@ -1147,8 +1206,18 @@ const AdminSettings: React.FC = () => {
           <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-4">
             API Integration Information
           </h3>
-          <div className="space-y-3 text-sm text-blue-800 dark:text-blue-200">
-            <p>• <strong>MASKAWA Token:</strong> Required for airtime, data, and electricity bill payments</p>
+          <div className="space-y-4 text-sm text-blue-800 dark:text-blue-200">
+            <div>
+              <p className="font-semibold mb-1">Active API Provider</p>
+              <p>You can switch between MASKAWA and NaijaDataSub APIs using the "Active API Provider" setting above.</p>
+            </div>
+            
+            <div>
+              <p className="font-semibold mb-1">API Tokens</p>
+              <p>• <strong>MASKAWA Token:</strong> Required for airtime, data, and electricity bill payments when using MASKAWA API</p>
+              <p>• <strong>NaijaDataSub Token:</strong> Required for airtime, data, and electricity bill payments when using NaijaDataSub API</p>
+            </div>
+            
             <p>• <strong>Flutterwave Keys:</strong> Required for virtual account creation and payment processing</p>
             <p>• <strong>Security:</strong> API tokens are encrypted and only accessible to admin users</p>
             <p>• <strong>Important Note:</strong> The Flutterwave Secret Key is not stored here and must be set in your Supabase Edge Function environment variables</p>
