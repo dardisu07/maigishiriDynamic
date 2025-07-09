@@ -297,7 +297,6 @@ const AdminDashboard: React.FC = () => {
       color: 'bg-amber-500',
     },
     {
-    {
       title: 'Cable TV Plans',
       description: 'Manage TV subscription plans',
       icon: Tv,
