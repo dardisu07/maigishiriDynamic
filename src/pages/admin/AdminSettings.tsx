@@ -117,7 +117,25 @@ const AdminSettings: React.FC = () => {
 
   // Check if we need to add new settings
   const ensureRequiredSettings = async () => {
-    const requiredSettings = [
+    try {
+      // First, fetch all existing settings to avoid overwriting them
+      const { data: existingSettings, error: fetchError } = await supabase
+        .from('admin_settings')
+        .select('key, value');
+
+      if (fetchError) {
+        console.error('Error fetching existing settings:', fetchError);
+        return;
+      }
+
+      // Create a map of existing settings for easy lookup
+      const existingSettingsMap = new Map();
+      existingSettings?.forEach(setting => {
+        existingSettingsMap.set(setting.key, setting.value);
+      });
+
+      // Define required settings with their default values
+      const requiredSettings = [
       {
         key: 'active_api_provider',
         value: 'maskawa',
@@ -242,30 +260,34 @@ const AdminSettings: React.FC = () => {
       }
     ];
 
-    try {
-      // Use upsert to insert or update settings without causing conflicts
-      const { error } = await supabase
-        .from('admin_settings')
-        .upsert(
-          requiredSettings.map(setting => ({
-            key: setting.key,
-            value: setting.value,
-            description: setting.description,
-            updated_by: user?.id
-          })),
-          { 
-            onConflict: 'key',
-            ignoreDuplicates: false 
-          }
-        );
+      // Filter out settings that already exist
+      const missingSettings = requiredSettings.filter(setting => 
+        !existingSettingsMap.has(setting.key)
+      );
 
-      if (error) {
-        console.error('Error upserting settings:', error);
-        return;
+      if (missingSettings.length > 0) {
+        // Only insert settings that don't already exist
+        const { error } = await supabase
+          .from('admin_settings')
+          .insert(
+            missingSettings.map(setting => ({
+              key: setting.key,
+              value: setting.value,
+              description: setting.description,
+              updated_by: user?.id
+            }))
+          );
+
+        if (error) {
+          console.error('Error inserting missing settings:', error);
+          return;
+        }
+
+        console.log(`Added ${missingSettings.length} missing settings`);
+        
+        // Refresh settings after adding new ones
+        fetchSettings();
       }
-
-      // Refresh settings after ensuring they exist
-      fetchSettings();
     } catch (error) {
       console.error('Error in ensureRequiredSettings:', error);
     }
