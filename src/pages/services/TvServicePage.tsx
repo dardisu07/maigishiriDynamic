@@ -1188,3 +1188,5 @@ const TvServicePage: React.FC = () => {
     </>
   );
 };
+
+export default TvServicePage;
