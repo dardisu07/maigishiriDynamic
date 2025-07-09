@@ -11,7 +11,7 @@ import { supabase } from '../../lib/supabase';
 import Button from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
-import { Card } from '../../components/ui/Card';
+import Card from '../../components/ui/Card';
 import Badge from '../../components/ui/Badge';
 
 type DataPlan = {
