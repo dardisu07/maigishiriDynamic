@@ -19,6 +19,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 import { formatCurrency, formatDate, formatDateTime } from '../../lib/utils';
+import Button from '../../components/ui/Button';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 

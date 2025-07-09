@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
+import Button from '../../components/ui/Button';
 
 type ProductCategory = {
   id: string;

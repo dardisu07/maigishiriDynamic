@@ -8,7 +8,7 @@ import {
   RefreshCw, Eye, EyeOff, ToggleLeft, ToggleRight
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
-import { Button } from '../../components/ui/Button';
+import Button from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { Card } from '../../components/ui/Card';

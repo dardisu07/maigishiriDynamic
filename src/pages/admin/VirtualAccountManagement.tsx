@@ -4,6 +4,7 @@ import { ArrowLeft, Search, Filter, Ban as Bank, Trash2, AlertTriangle, User, Ma
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 import { useAppSettingsStore } from '../../store/appSettingsStore';
+import Button from '../../components/ui/Button';
 import { formatDate } from '../../lib/utils';
 
 type VirtualAccount = {
