@@ -16,6 +16,13 @@ export const DISCO_MAPPINGS = {
   'abuja': 'abuja-electric',
 } as const;
 
+// Cable provider mappings
+export const CABLE_MAPPINGS = {
+  'dstv': 2,
+  'gotv': 1,
+  'startime': 3,
+} as const;
+
 class NaijaDataSubAPI {
   private getEdgeFunctionUrl() {
     const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
@@ -73,6 +80,27 @@ class NaijaDataSubAPI {
     }
   }
 
+  async buyCable(data: {
+    cable_name: string;
+    cable_plan: string;
+    smart_card_number: string;
+  }) {
+    return await this.makeEdgeFunctionRequest('buy_cable', {
+      cable_name: data.cable_name,
+      cable_plan: data.cable_plan,
+      smart_card_number: data.smart_card_number,
+    });
+  }
+
+  async validateSmartCard(data: {
+    cable_name: string;
+    smart_card_number: string;
+  }) {
+    return await this.makeEdgeFunctionRequest('validate_smart_card', {
+      cable_name: data.cable_name,
+      smart_card_number: data.smart_card_number,
+    });
+  }
   async checkUserDetails() {
     return await this.makeEdgeFunctionRequest('check_user_details', {});
   }

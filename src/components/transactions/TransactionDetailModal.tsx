@@ -32,6 +32,8 @@ const getTransactionLabel = (type: string, details: any) => {
     case 'waec':
       return 'WAEC Card';
     case 'wallet_funding':
+    case 'cable':
+      return `${details.cable_provider} - ${details.cable_plan} - ${details.smart_card_number}`;
       // Check if this is a bank transfer with originator info
       if (details.flutterwave_data?.meta_data?.originatorname) {
         return `Wallet Funding from ${details.flutterwave_data.meta_data.originatorname} (${details.payment_method || 'bank_transfer'})`;
@@ -229,6 +231,31 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
       const filteredDetails = { ...details };
       if (filteredDetails.api_response) {
         filteredDetails.api_response = '(API response data)';
+      }
+
+      if (transaction.type === 'cable') {
+        return (
+          <div className="space-y-2">
+            <div className="flex justify-between">
+              <span className="text-gray-600 dark:text-gray-400">Provider:</span>
+              <span className="font-medium capitalize">{details.cable_provider}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600 dark:text-gray-400">Plan:</span>
+              <span className="font-medium">{details.cable_plan}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600 dark:text-gray-400">Smart Card Number:</span>
+              <span className="font-medium">{details.smart_card_number}</span>
+            </div>
+            {details.service_provider && (
+              <div className="flex justify-between">
+                <span className="text-gray-600 dark:text-gray-400">Provider:</span>
+                <span className="font-medium capitalize">{details.service_provider}</span>
+              </div>
+            )}
+          </div>
+        );
       }
       
       return (

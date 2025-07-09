@@ -8,6 +8,7 @@ import AirtimeServicePage from './pages/services/AirtimeServicePage';
 import DataServicePage from './pages/services/DataServicePage';
 import ElectricityServicePage from './pages/services/ElectricityServicePage';
 import WaecServicePage from './pages/services/WaecServicePage';
+import TvServicePage from './pages/services/TvServicePage';
 import StorePage from './pages/store/StorePage';
 import ProductDetailPage from './pages/store/ProductDetailPage';
 import CartPage from './pages/store/CartPage';
@@ -34,6 +35,7 @@ import AdminSettings from './pages/admin/AdminSettings';
 import OrdersManagement from './pages/admin/OrdersManagement';
 import WalletManagement from './pages/admin/WalletManagement';
 import DataPlansManagement from './pages/admin/DataPlansManagement';
+import CablePlansManagement from './pages/admin/CablePlansManagement';
 import VirtualAccountManagement from './pages/admin/VirtualAccountManagement';
 import SupportTicketsManagement from './pages/admin/SupportTicketsManagement';
 
@@ -75,6 +77,7 @@ function App() {
         <Route path="/admin/wallet" element={<WalletManagement />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
         <Route path="/admin/data-plans" element={<DataPlansManagement />} />
+        <Route path="/admin/cable-plans" element={<CablePlansManagement />} />
         <Route path="/admin/virtual-accounts" element={<VirtualAccountManagement />} />
         <Route path="/admin/support-tickets" element={<SupportTicketsManagement />} />
 
@@ -94,6 +97,7 @@ function App() {
           <Route path="services/airtime" element={<AirtimeServicePage />} />
           <Route path="services/data" element={<DataServicePage />} />
           <Route path="services/electricity" element={<ElectricityServicePage />} />
+          <Route path="services/tv" element={<TvServicePage />} />
           <Route path="services/waec" element={<WaecServicePage />} />
           <Route path="store" element={<StorePage />} />
           <Route path="store/product/:id" element={<ProductDetailPage />} />

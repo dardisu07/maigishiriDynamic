@@ -65,6 +65,8 @@ export function getTransactionLabel(type: string, details: any) {
       return `${details.disco} - ${details.meterNumber}`;
     case 'waec':
       return 'WAEC Card';
+    case 'cable':
+      return `${details.cable_provider} - ${details.cable_plan} - ${details.smart_card_number}`;
     case 'wallet_funding':
       // Check if this is a bank transfer with originator info
       if (details.flutterwave_data?.meta_data?.originatorname) {
@@ -81,5 +83,5 @@ export function getTransactionLabel(type: string, details: any) {
 }
 
 export function isDebit(type: string) {
-  return ['airtime', 'data', 'electricity', 'waec', 'product_purchase'].includes(type);
+  return ['airtime', 'data', 'electricity', 'waec', 'cable', 'product_purchase'].includes(type);
 }

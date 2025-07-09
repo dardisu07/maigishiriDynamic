@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Users, ShoppingBag, DollarSign, TrendingUp, Settings, Package, CreditCard, Activity, LogOut, Eye, Plus, Wallet, Wifi, Ban as Bank, Tag, MessageCircle } from 'lucide-react';
+import { Users, ShoppingBag, DollarSign, TrendingUp, Settings, Package, CreditCard, Activity, LogOut, Eye, Plus, Wallet, Wifi, Ban as Bank, Tag, MessageCircle, Tv } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../store/authStore';
 import { formatCurrency } from '../../lib/utils';
@@ -297,6 +297,13 @@ const AdminDashboard: React.FC = () => {
       color: 'bg-amber-500',
     },
     {
+    {
+      title: 'Cable TV Plans',
+      description: 'Manage TV subscription plans',
+      icon: Tv,
+      path: '/admin/cable-plans',
+      color: 'bg-blue-500',
+    },
       title: 'Support Tickets',
       description: 'Manage customer support',
       icon: MessageCircle,

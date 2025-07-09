@@ -3,7 +3,7 @@ import { naijadatasubAPI } from './naijadatasubApi';
 import { supabase } from './supabase';
 import { generateTransactionReference } from './utils';
 
-export type ServiceType = 'airtime' | 'data' | 'electricity';
+export type ServiceType = 'airtime' | 'data' | 'electricity' | 'cable';
 
 export interface ServiceTransaction {
   id: string;
@@ -430,6 +430,113 @@ class ServiceAPI {
       }
 
       // For any other errors, use the original message or a generic fallback
+      throw new Error(error.message || 'Transaction failed. Please try again or contact support if the issue persists.');
+    }
+  }
+
+  async processCableTransaction(
+    userId: string,
+    data: {
+      cableProvider: string;
+      cablePlan: string;
+      smartCardNumber: string;
+      amount: number;
+    }
+  ): Promise<ServiceTransaction> {
+    const reference = generateTransactionReference();
+    
+    // Create pending transaction
+    const transaction = {
+      user_id: userId,
+      type: 'cable' as ServiceType,
+      amount: data.amount,
+      status: 'pending' as const,
+      reference,
+      details: {
+        cable_provider: data.cableProvider,
+        cable_plan: data.cablePlan,
+        smart_card_number: data.smartCardNumber,
+        service_provider: 'naijadatasub',
+      },
+    };
+
+    const { data: dbTransaction, error: dbError } = await supabase
+      .from('transactions')
+      .insert([transaction])
+      .select()
+      .single();
+
+    if (dbError) {
+      console.error('Database error creating transaction:', dbError);
+      throw new Error('Failed to create transaction record. Please try again.');
+    }
+
+    try {
+      // Call NaijaDataSub API
+      const apiResponse = await naijadatasubAPI.buyCable({
+        cable_name: data.cableProvider.toUpperCase(),
+        cable_plan: data.cablePlan,
+        smart_card_number: data.smartCardNumber,
+      });
+
+      // Update transaction as successful
+      const { error: updateError } = await supabase
+        .from('transactions')
+        .update({
+          status: 'success',
+          details: {
+            ...transaction.details,
+            api_response: apiResponse,
+            external_reference: apiResponse?.reference || apiResponse?.id || apiResponse?.transaction_id,
+            api_provider: 'naijadatasub'
+          },
+        })
+        .eq('id', dbTransaction.id);
+
+      if (updateError) throw updateError;
+
+      return {
+        ...dbTransaction,
+        status: 'success',
+      };
+    } catch (error: any) {
+      console.error('API error during cable subscription:', error);
+      
+      // Update transaction as failed
+      const { error: updateError } = await supabase
+        .from('transactions')
+        .update({
+          status: 'failed',
+          details: {
+            ...transaction.details,
+            error: error instanceof Error ? error.message : 'Unknown error',
+            error_time: new Date().toISOString(),
+          },
+        })
+        .eq('id', dbTransaction.id);
+
+      if (updateError) {
+        console.error('Database error updating failed transaction:', updateError);
+      }
+
+      // Provide user-friendly error messages
+      if (error.message.includes('API token not configured') || 
+          error.message.includes('YOUR_NAIJADATASUB_TOKEN_HERE')) {
+        throw new Error('Payment service not configured. Please contact support to set up the payment system.');
+      }
+      
+      if (error.message.includes('API configuration not found') ||
+          error.message.includes('API configuration is incomplete')) {
+        throw new Error('Payment service configuration missing. Please contact support.');
+      }
+      
+      if (error.message.includes('Unable to connect') || 
+          error.message.includes('Network connection error') ||
+          error.message.includes('timeout') || 
+          error.message.includes('Failed to fetch')) {
+        throw new Error('Unable to connect to payment service. Please check your internet connection and try again.');
+      }
+
       throw new Error(error.message || 'Transaction failed. Please try again or contact support if the issue persists.');
     }
   }
