@@ -16,6 +16,13 @@ import { formatCurrency } from '../../lib/utils';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
 
+// Validity unit options
+const validityUnits = [
+  { value: 'days', label: 'Days' },
+  { value: 'weeks', label: 'Weeks' },
+  { value: 'months', label: 'Months' },
+];
+
 type DataPlan = {
   id: string;
   external_id: number;
