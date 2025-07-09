@@ -26,7 +26,7 @@ class ServiceAPI {
         .eq('key', 'active_api_provider')
         .single();
 
-      if (error) {
+      if (error || !data?.value) {
         console.error('Error fetching active API provider:', error);
         return 'maskawa'; // Default to maskawa if there's an error
       }

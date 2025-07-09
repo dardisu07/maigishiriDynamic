@@ -43,17 +43,20 @@ serve(async (req) => {
       .in('key_name', ['naijadatasub_token', 'naijadatasub_base_url'])
 
     if (settingsError) {
-      throw new Error('Failed to fetch API configuration')
+      console.error('Settings error:', settingsError)
+      throw new Error('API configuration not found. Please contact support to configure the payment service.')
     }
 
     const tokenSetting = settings?.find(s => s.key_name === 'naijadatasub_token')
     const baseUrlSetting = settings?.find(s => s.key_name === 'naijadatasub_base_url')
 
     if (!tokenSetting?.key_value || !baseUrlSetting?.key_value) {
-      throw new Error('API configuration not found')
+      throw new Error('API configuration is incomplete. Please contact support to set up the payment system.')
     }
 
-    if (tokenSetting.key_value === 'YOUR_NAIJADATASUB_TOKEN_HERE') {
+    if (tokenSetting.key_value === 'YOUR_NAIJADATASUB_TOKEN_HERE' || 
+        tokenSetting.key_value.trim() === '' || 
+        tokenSetting.key_value.length < 10) {
       throw new Error('API token not configured. Please update the token in admin settings.')
     }
 
