@@ -127,20 +127,6 @@ serve(async (req) => {
         method = 'GET'
         break
 
-      case 'buy_cable':
-        apiEndpoint = '/api/cablesub/'
-        apiPayload = {
-          cablename: data.cable_name,
-          cableplan: data.cable_plan,
-          smart_card_number: data.smart_card_number
-        }
-        break
-
-      case 'validate_smart_card':
-        apiEndpoint = `/api/validateiuc?smart_card_number=${data.smart_card_number}&cablename=${data.cable_name}`
-        method = 'GET'
-        break
-
       default:
         throw new Error('Invalid action')
     }

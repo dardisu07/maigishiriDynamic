@@ -293,12 +293,13 @@ const DataServicePage: React.FC = () => {
       return;
     }
 
+    // Store original wallet balance for potential refund
+    const originalBalance = user.walletBalance;
+    
     setIsLoading(true);
     setErrorMessage('');
 
     try {
-      // Store original wallet balance for potential refund
-      const originalBalance = user.walletBalance;
       const amount = selectedPlan.selling_price;
       
       if (user.walletBalance < amount) {
