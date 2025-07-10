@@ -236,6 +236,8 @@ const TvServicePage: React.FC = () => {
     setErrorMessage('');
 
     try {
+      // Store original wallet balance for potential refund
+      const originalBalance = user.walletBalance;
       const amount = selectedPlan.selling_price;
       
       if (user.walletBalance < amount) {
@@ -265,6 +267,12 @@ const TvServicePage: React.FC = () => {
       setStep(3);
     } catch (error: any) {
       console.error('Cable subscription error:', error);
+      
+      // Refund the wallet if it was already debited
+      if (user.walletBalance < originalBalance) {
+        await updateWalletBalance(originalBalance);
+      }
+      
       setErrorMessage(error.message || 'Failed to process subscription. Please try again.');
       setIsSuccess(false);
       setStep(3);

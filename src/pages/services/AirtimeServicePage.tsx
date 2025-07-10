@@ -178,6 +178,8 @@ const AirtimeServicePage: React.FC = () => {
     setErrorMessage('');
 
     try {
+      // Store original wallet balance for potential refund
+      const originalBalance = user.walletBalance;
       const numAmount = Number(amount);
       
       if (user.walletBalance < numAmount) {
@@ -206,6 +208,11 @@ const AirtimeServicePage: React.FC = () => {
       setStep(3);
     } catch (error: any) {
       console.error('Airtime purchase error:', error);
+      
+      // Refund the wallet if it was already debited
+      if (user.walletBalance < originalBalance) {
+        await updateWalletBalance(originalBalance);
+      }
       
       // Set user-friendly error message
       let userErrorMessage = 'Failed to purchase airtime. Please try again.';

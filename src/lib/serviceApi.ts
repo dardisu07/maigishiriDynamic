@@ -53,7 +53,7 @@ class ServiceAPI {
       user_id: userId,
       type: 'airtime' as ServiceType,
       amount: data.amount,
-      status: 'pending' as const,
+      status: 'success' as const,
       reference,
       details: {
         network: data.network,
@@ -74,7 +74,7 @@ class ServiceAPI {
     }
 
     try {
-      // Call MASKAWA API
+      // Call API (MASKAWA or NaijaDataSub)
       const activeProvider = await this.getActiveApiProvider();
       let apiResponse;
       
@@ -92,11 +92,10 @@ class ServiceAPI {
         });
       }
 
-      // Update transaction as successful
-      const { error: updateError } = await supabase
+      // Update transaction details with API response
+      await supabase
         .from('transactions')
         .update({
-          status: 'success',
           details: {
             ...transaction.details,
             api_response: apiResponse,
@@ -105,11 +104,6 @@ class ServiceAPI {
           },
         })
         .eq('id', dbTransaction.id);
-
-      if (updateError) {
-        console.error('Database error updating transaction:', updateError);
-        // Don't throw here as the API call was successful
-      }
 
       return {
         ...dbTransaction,
@@ -184,7 +178,7 @@ class ServiceAPI {
       user_id: userId,
       type: 'data' as ServiceType,
       amount: data.amount,
-      status: 'pending' as const,
+      status: 'success' as const,
       reference,
       details: {
         network: data.network,
@@ -206,7 +200,7 @@ class ServiceAPI {
     }
 
     try {
-      // Call MASKAWA API
+      // Call API (MASKAWA or NaijaDataSub)
       const activeProvider = await this.getActiveApiProvider();
       let apiResponse;
       
@@ -224,11 +218,10 @@ class ServiceAPI {
         });
       }
 
-      // Update transaction as successful
-      const { error: updateError } = await supabase
+      // Update transaction details with API response
+      await supabase
         .from('transactions')
         .update({
-          status: 'success',
           details: {
             ...transaction.details,
             api_response: apiResponse,
@@ -237,11 +230,6 @@ class ServiceAPI {
           },
         })
         .eq('id', dbTransaction.id);
-
-      if (updateError) {
-        console.error('Database error updating transaction:', updateError);
-        // Don't throw here as the API call was successful
-      }
 
       return {
         ...dbTransaction,

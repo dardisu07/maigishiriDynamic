@@ -86,6 +86,8 @@ const ElectricityServicePage: React.FC = () => {
     setErrorMessage('');
 
     try {
+      // Store original wallet balance for potential refund
+      const originalBalance = user.walletBalance;
       const amount = Number(formData.amount);
       
       if (user.walletBalance < amount) {
@@ -109,15 +111,16 @@ const ElectricityServicePage: React.FC = () => {
       setStep(3);
     } catch (error: any) {
       console.error('Electricity payment error:', error);
+      
+      // Refund the wallet if it was already debited
+      if (user.walletBalance < originalBalance) {
+        await updateWalletBalance(originalBalance);
+      }
+      
       setErrorMessage(error.message || 'Failed to pay electricity bill. Please try again.');
       setIsSuccess(false);
       setStep(3);
       
-      // If wallet was deducted but transaction failed, we should refund
-      if (user && error.message !== 'Insufficient wallet balance') {
-        // Refund the wallet
-        await updateWalletBalance(user.walletBalance);
-      }
     } finally {
       setIsLoading(false);
       setShowPinModal(false);
