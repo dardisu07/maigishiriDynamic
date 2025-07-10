@@ -221,11 +221,10 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
               <span className="font-medium">{details.note}</span>
             </div>
           )}
-                <span className="font-medium">Maigishiri Dynamic</span>
+        </div>
       );
     }
     
-                <span className="font-medium">Maigishiri Dynamic</span>
     try {
       // Filter out sensitive information
       const filteredDetails = { ...details };
@@ -379,8 +378,3 @@ const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
 };
 
 export default TransactionDetailModal;
-    
-    // Replace service_provider with Maigishiri Dynamic
-    if (filteredDetails.service_provider) {
-      filteredDetails.service_provider = 'Maigishiri Dynamic';
-    }
