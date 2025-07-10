@@ -82,7 +82,7 @@ serve(async (req) => {
         apiPayload = {
           network: NETWORK_MAPPINGS[data.network as keyof typeof NETWORK_MAPPINGS],
           mobile_number: data.mobile_number,
-          plan: data.plan,
+          plan: parseInt(data.plan, 10),
           Ported_number: data.ported_number || true
         }
         break
