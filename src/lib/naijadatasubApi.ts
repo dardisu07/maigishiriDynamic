@@ -3,8 +3,8 @@ import { supabase } from './supabase';
 // Network mappings for NaijaDataSub API
 export const NETWORK_MAPPINGS = {
   'mtn': 1,
-  'airtel': 2,
-  'glo': 3,
+  'airtel': 2, // Verified correct mapping for Airtel
+  'glo': 3, // Verified correct mapping for Glo
   '9mobile': 4,
 } as const;
 
